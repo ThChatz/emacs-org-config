@@ -1,8 +1,8 @@
-My emacs configuration
+#+TITLE: My emacs configuration
 
 # Set to 'yes' in order to use EXWM as your window manager
 #+PROPERTY: USE_EXWM yes
-#+PROPERTY: header-args :tangle yes :eval yes
+#+PROPERTY: header-args :tangle yes
 
 * Conventions
 ** Document structure
@@ -22,111 +22,97 @@ My emacs configuration
    We can use this to easily disable parts of the configuration
    (e.g. to disable exwm)
 * Installation
-  Sample [[elisp:(find-file%20(expand-file-name%20"init.el"%20user-emacs-directory))][init.el]]
-  Basically we need to initialize and refresh the contents
-  of the package manager, make sure we have use-package and org-mode
-  installed. After that we use org-babel-load-file to load the
-  configuration stored in this file.
-  [[elisp:((lambda%20(file)%20(copy-file%20file%20(concat%20file%20".bk")%20t)%20(search-forward%20"#+BEGIN_SRC")%20(next-line)%20(org-edit-src-code)%20(write-file%20file%20t)%20(kill-buffer)%20(find-file%20(expand-file-name%20file%20user-emacs-directory))%20(print%20(format%20"%25s%20backed%20up%20to%20%25s"%20file%20(concat%20file%20".bk"))))%20(expand-file-name%20"init.el"%20user-emacs-directory))][Create init.el]](This will OVERWRITE your current init.el)
-  #+BEGIN_SRC emacs-lisp :tangle no
-    (require 'package)
-    (setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/")
-			     ("melpa" . "https://melpa.org/packages/")
-			     ("org" . "https://orgmode.org/elpa/")))
+  Run this to install
+  !!! Do not run if you already have a configuration
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun install-org-config ()
+   (find-file (expand-file-name "init.el" user-emacs-directory))
+   (insert "(require 'package)
+  (require 'org)
 
-    (package-initialize)
-    (let ((usep? (require 'use-package nil 'noerror)))
-      ;; we reload the archives syncronously for the first time
-      ;; in order to fetch the packages
-      (package-refresh-contents usep?)
-      (when (not usep?)
-	(package-install 'use-package)))
+  (package-initialize)
+  (org-babel-load-file
+   (expand-file-name \"conf.org\" user-emacs-directory))")
+  (save-buffer)
+  (kill-buffer))
 
-    (require 'use-package)
-    (use-package org-plus-contrib
-      :ensure t
-      :defer t)
-
-    (require 'org)
-    (org-babel-load-file
-    (expand-file-name "conf.org" user-emacs-directory))
-  #+END_SRC
-  
+  (install-org-config)
+#+END_SRC
 * Visual
 ** Theme
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package cyberpunk-theme
     :ensure t)
-    #+END_SRC
+#+END_SRC
 
 ** Modeline
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
      (use-package powerline
        :ensure t
        :config
        (powerline-center-theme))
-       #+END_SRC
+#+END_SRC
 ** Cursor
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq-default cursor-type 'bar)
-  #+END_SRC
+#+END_SRC
 ** Beacon-mode
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package beacon
     :ensure t
     :config
     (beacon-mode t))
 
 
-   #+END_SRC
+#+END_SRC
 * EXWM
   :PROPERTIES:
   :header-args: :tangle (org-entry-get nil "USE_EXWM" t)
   :END:
 ** Base configuration
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
    (use-package exwm
     :ensure t)
-    #+END_SRC
+#+END_SRC
 
 ** Default config
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (require 'exwm-config)
   (exwm-config-default)
-  #+END_SRC
+#+END_SRC
 **  Status bar
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (require 'exwm-systemtray)
       (exwm-systemtray-enable)
-      #+END_SRC
+#+END_SRC
 ** Dmenu
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package dmenu
     :ensure t
     :bind ("s-d" . dmenu))
    
-   #+END_SRC
+#+END_SRC
 ** Applications
 ***  Terminal
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "s-<return>") (lambda ()
                                      (interactive)
                                      (ansi-term shell-file-name)))
-				     #+END_SRC
+#+END_SRC
 *** Browser
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "s-b")
                   (lambda ()
                                 (interactive)
                                 (start-process "Firefox" nil "firefox")))
-				#+END_SRC
+#+END_SRC
 * Text Editor
 ** Global tweaks
 *** Shell-command
     If there is a prefix argument call shell-command so that we don't move the point
     while the command is executing else call async-shell-command
     
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun my-shell-command (&optional p)
     (interactive "P")
     (if p
@@ -134,44 +120,44 @@ My emacs configuration
       (call-interactively 'async-shell-command)))
 
   (global-set-key (kbd "M-!") 'my-shell-command)
-  #+END_SRC
+#+END_SRC
 
 *** Windmove
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (use-package windmove
         :ensure t
         :bind (("C-c h" . windmove-left)
                ("C-c j" . windmove-down)
                ("C-c k" . windmove-up)
                ("C-c l" . windmove-right)))
-	       #+END_SRC
+#+END_SRC
 *** Yasnippet
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (use-package yasnippet
       :ensure t
       :config
       (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
       (yas-global-mode t))
-      #+END_SRC
+#+END_SRC
 
 *** Undo-tree
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (use-package undo-tree
         :ensure t
         :config (setq-default undo-tree-mode t)
         :bind ("C-x /" . undo-tree-visualize))
-	#+END_SRC
+#+END_SRC
 *** IDO
 **** Ensure and enable
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ido
     :ensure t
     :config 
     (ido-mode t)
     (ido-everywhere t))
-    #+END_SRC
+#+END_SRC
 **** smex
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
        (use-package smex
          :ensure t
          :init 
@@ -181,17 +167,17 @@ My emacs configuration
          ( "M-x" . smex)
          ( "M-X" . smex-major-mode-commands)
          ( "C-c M-x" . execute-extended-command))
-	 #+END_SRC
+#+END_SRC
 **** ido-vertical
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ido-vertical-mode
     :ensure t
     :config
     (ido-vertical-mode 1)
     (setq ido-vertical-define-keys 'C-n-and-C-p-only))
-    #+END_SRC
+#+END_SRC
 **** flx-ido
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package flx-ido
     :ensure t
     :init 
@@ -199,17 +185,17 @@ My emacs configuration
     (flx-ido-mode t)
     (setq ido-use-faces nil)
     :bind )
-    #+END_SRC
+#+END_SRC
 *** Nlinum
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (use-package nlinum
         :ensure t
         :config
         (setq nlinum-format "%6d")
         (global-nlinum-mode))
-	#+END_SRC
+#+END_SRC
 *** Avy
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package avy
     :ensure t
     :init 
@@ -220,26 +206,26 @@ My emacs configuration
     ("C-c g j" . avy-goto-char-timer)
     ("C-c g l" . avy-goto-line))
 
-    #+END_SRC
+#+END_SRC
 *** Company
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (use-package company
         :ensure t
         :init 
         :config (add-hook 'after-init-hook 'global-company-mode)
         :bind )
 
-    #+END_SRC
+#+END_SRC
 *** God-mode
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
           (use-package god-mode
             :ensure t
             :init 
             :config 
             :bind ("ESC M-g" . 'god-mode-all))
-	    #+END_SRC
+#+END_SRC
 *** Autopair
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package autopair 
     :ensure t
     :init 
@@ -250,17 +236,17 @@ My emacs configuration
      autopair-blink t
      autopair-skip-whitespace t)
     :bind )
-    #+END_SRC
+#+END_SRC
 *** Custom functions
 **** Config functions
      Visit Config
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun conf-edit ()
     (interactive)
     (find-file (expand-file-name "conf.org" user-emacs-directory)))
-    #+END_SRC
+#+END_SRC
 **** region-reduce-radius
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun region-reduce-radius (dr)
     (interactive "nReduce raduis by: ")
   "Shorten the region by 2*DR while mainaining the center"
@@ -272,10 +258,10 @@ My emacs configuration
       (activate-mark)))
 
   (global-set-key (kbd "C-c r r") 'region-reduce-radius)
-  #+END_SRC
+#+END_SRC
 
 **** change-word
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (defun my-kill-word ()
         (interactive)
         (when (= (char-syntax (char-before)) (string-to-char "w"))
@@ -283,9 +269,9 @@ My emacs configuration
         (kill-word 1))
 
     (global-set-key (kbd "C-c w") 'my-kill-word)
-    #+END_SRC
+#+END_SRC
 **** change-inside
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (require 'autopair)
 
   (defun my-change-inside (open)
@@ -300,11 +286,11 @@ My emacs configuration
           (forward-char))))
 
   (global-set-key (kbd "C-c i") 'my-change-inside)
-  #+END_SRC
+#+END_SRC
 **** change-outside
      The opposite of change-inside: changes the pair surrounding the balanced expression
      e.g. "foo" -> (foo) -> [foo]
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (require 'autopair)
 
   (defun my-change-outside (p1 p2)
@@ -324,123 +310,70 @@ My emacs configuration
 
 
   (global-set-key (kbd "C-c o") 'my-change-outside)
-  #+END_SRC
+#+END_SRC
 
 *** prettify-symbols
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (global-prettify-symbols-mode t)
-      #+END_SRC
+#+END_SRC
 ** Auctex
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (use-package auctex
       :ensure t
       :defer t)
-      #+END_SRC
+#+END_SRC
 ** Org-mode
+   :PROPERTIES:
+   :header-args: :tangle no
+   :END:
+*** Install From Repo
+#+BEGIN_SRC emacs-lisp
+  
+#+END_SRC    
 *** Global bindings
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp0
   (setq global-org-keymap (make-sparse-keymap))
   (define-key global-org-keymap (kbd "a") 'org-agenda)
   (define-key global-org-keymap (kbd "l") 'org-store-link)
   (define-key global-org-keymap (kbd "c") 'org-capture)
   (global-set-key (kbd "ESC M-o") global-org-keymap)
-  #+END_SRC
+#+END_SRC
 *** org-bullets
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
       (use-package org-bullets
         :ensure t)
       (add-hook 'org-mode-hook 'org-bullets-mode)
-      #+END_SRC
+#+END_SRC
 
 *** TODO org latex preview
     We will configure latex preview to work with unicode fonts
     First we use a backend that supports fontspec
-    
-    #+BEGIN_SRC emacs-lisp
-    (require 'ox)
 
-  (setq org-preview-latex-process-alist
-	'((dvipng
-	   :programs ("latex" "dvipng")
-	   :description "dvi > png"
-	   :message "you need to install the programs: xelatex and dvipng."
-	   :image-input-type "xdv"
-	   :image-output-type "png"
-	   :image-size-adjust (1.0 . 1.0)
-	   :latex-compiler ("latex -interaction nonstopmode -no-pdf -output-directory %o %f")
-	   :image-converter ("dvipng -fg %F -bg %B -D %D -T tight -o %O %f"))
-	  (dvisvgm
-	   :programs ("xelatex" "dvisvgm")
-	   :description "dvi > svg"
-	   :message "you need to install the programs: xelatex and dvisvgm."
-	   :use-xcolor t
-	   :image-input-type "xdv"
-	   :image-output-type "svg"
-	   :image-size-adjust (1.7 . 1.5)
-	   :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
-	   :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))
-	  (imagemagick
-	   :programs ("latex" "convert")
-	   :description "pdf > png"
-	   :message "you need to install the programs: xelatex and imagemagick."
-	   :use-xcolor t
-	   :image-input-type "pdf"
-	   :image-output-type "png"
-	   :image-size-adjust (1.0 . 1.0)
-	   :latex-compiler ("xelatex -interaction nonstopmode -output-directory %o %f")
-	   :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))))
-
-  (setq org-preview-latex-default-process 'dvisvgm)
-  #+END_SRC
-    Then well add a unicode font in our default headers
-    #+BEGIN_SRC emacs-lisp
-    (setq
-     org-format-latex-header
-     "\\documentclass{article}
-    \\usepackage[usenames]{color}
-    [PACKAGES]
-    [DEFAULT-PACKAGES]
-    \\setmainfont{DejaVu Serif}
-    \\pagestyle{empty}             % do not remove
-    % The settings below are copied from fullpage.sty
-    \\setlength{\\textwidth}{\\paperwidth}
-    \\addtolength{\\textwidth}{-3cm}
-    \\setlength{\\oddsidemargin}{1.5cm}
-    \\addtolength{\\oddsidemargin}{-2.54cm}
-    \\setlength{\\evensidemargin}{\\oddsidemargin}
-    \\setlength{\\textheight}{\\paperheight}
-    \\addtolength{\\textheight}{-\\headheight}
-    \\addtolength{\\textheight}{-\\headsep}
-    \\addtolength{\\textheight}{-\\footskip}
-    \\addtolength{\\textheight}{-3cm}
-    \\setlength{\\topmargin}{1.5cm}
-    \\addtolength{\\topmargin}{-2.54cm}")
-    #+END_SRC
 *** org-export
 **** latex
      Use xelatex to render unicode characters
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
        (setq org-latex-pdf-process
        '("xelatex -interaction nonstopmode -output-directory %o %f"
         "xelatex -interaction nonstopmode -output-directory %o %f"
         "xelatex -interaction nonstopmode -output-directory %o %f"))
-	#+END_SRC
-     Add default latex packages
-     #+BEGIN_SRC emacs-lisp
-     ;; for unicode fonts
-     (add-to-list 'org-latex-packages-alist '("" "fontspec" t))
-     #+END_SRC
+#+END_SRC
+    Add default latex packages
+#+BEGIN_SRC emacs-lisp
+  ;; for unicode fonts
+  (add-to-list 'org-latex-packages-alist '("" "fontspec" t))
+#+END_SRC
      Configure document classes and use a reasonable font
      Some helper functions first
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;; default format string for class header
   (setq org-helper-class-generator-default-format-str
         "\\documentclass[%dpt]{%s}
-	[DEFAULT-PACKAGES]
-	[PACKAGES]
-	\\setmainfont{%s}
-	%s
-	[EXTRA]")
+  [DEFAULT-PACKAGES]
+  \\setmainfont{%s}
+  %s
+  [EXTRA]
+  [PACKAGES]")
 
   ;; handles the formating of a class header
   (defun org-helper-create-latex-class-header
@@ -459,10 +392,10 @@ My emacs configuration
              (list
               (org-helper-create-latex-class-header
                name font size extra-headers header-format-string))
-               section-alist))
-     #+END_SRC
+          section-alist))
+#+END_SRC
      Then define the document classes
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
        (setq org-latex-classes
              (list (org-helper-create-class
                     "article"
@@ -485,18 +418,18 @@ My emacs configuration
                       ("\\section{%s}" . "\\section*{%s}")
                       ("\\subsection{%s}" . "\\subsection*{%s}")
                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
-		      
-     #+END_SRC
+#+END_SRC
 ** TODO Project management
 *** Magit
-    #+BEGIN_SRC emacs-lisp
-    (use-package magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
     :ensure t
     :init 
     :config 
     :bind )
-    #+END_SRC
+#+END_SRC
 
 ** TODO C/C++
 ** TODO Python
 ** TODO More langs
+
