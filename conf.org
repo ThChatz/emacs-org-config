@@ -1,7 +1,7 @@
 My emacs configuration
 
 # Set to 'yes' in order to use EXWM as your window manager
-#+PROPERTY: USE_EXWM yes
+#+PROPERTY: USE_EXWM no
 # We want to tangle everything by default
 #+PROPERTY: header-args :tangle yes :eval query :results silent
 
@@ -87,6 +87,11 @@ My emacs configuration
      (byte-recompile-directory (file-name-directory (locate-library "org")) 0 t)
    #+END_SRC
 
+** Imagemagick segfaults - emacs 26.1 & IM 7
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (setenv "MAGICK_OCL_DEVICE" "OFF")
+   #+END_SRC
+
 * Visual
 ** Theme
    
@@ -130,10 +135,11 @@ My emacs configuration
    #+BEGIN_SRC emacs-lisp
      (set-face-attribute 'default nil 
 			 :width 'expanded
-			 :height 120
+			 :height 110
 			 :weight 'normal
 			 :stipple nil
-			 :font "Anonymous Pro")
+			 :font "Source code Pro")
+     (set-fontset-font "fontset-default" 'unicode "Wuncon Siji")
    #+END_SRC   
 
 ** Cursor
@@ -147,6 +153,12 @@ My emacs configuration
        :config
        (beacon-mode t))
    #+END_SRC
+** Remove bars
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode 0)
+  (menu-bar-mode 0)
+  (scroll-bar-mode 0)
+#+END_SRC   
 * EXWM
   :PROPERTIES:
   :header-args: :tangle (org-entry-get nil "USE_EXWM" t)
@@ -246,10 +258,10 @@ My emacs configuration
    #+BEGIN_SRC emacs-lisp
      (use-package windmove
        :ensure t
-       :bind (("C-c h" . windmove-C-c-move-left)
-	      ("C-c j" . windmove-C-c-move-down)
-	      ("C-c k" . windmove-C-c-move-up)
-	      ("C-c l" . windmove-C-c-move-right)))
+       :bind (("C-c h" . windmove-left)
+	      ("C-c j" . windmove-down)
+	      ("C-c k" . windmove-up)
+	      ("C-c l" . windmove-right)))
    #+END_SRC
 *** With hydra
     #+BEGIN_SRC emacs-lisp
@@ -308,6 +320,26 @@ My emacs configuration
 
 * Text Editor
 ** Global tweaks
+*** Registers
+    #+BEGIN_SRC emacs-lisp
+      ;; (defun register-entry (e)
+      ;;   (let ((r (pop e))
+      ;; 	(t (pop e))
+      ;; 	(a (pop e)))
+      ;;     '(set-register r `(t . ,a))))
+
+      ;; (register-entry '(?a 'file "c"))
+
+      (set-register ?c `(file . ,(expand-file-name "conf.org" user-emacs-directory)))
+      (set-register ?m `(file . ,"Makefile"))
+    #+END_SRC
+*** Quick Compile
+    #+BEGIN_SRC emacs-lisp
+      (global-set-key (kbd "C-c c")
+		      '(lambda ()
+			 (interactive)
+			 (compile "make")))
+    #+END_SRC
 *** Shell-command
     If there is a prefix argument call shell-command so that we don't move the point
     while the command is executing else call async-shell-command
@@ -355,21 +387,45 @@ My emacs configuration
 	(setq avy-keys (number-sequence ?a ?z)
 	      avy-timeout-seconds 0.5)
 	:bind
-	("C-c g j" . avy-goto-char-timer)
+	("C-c g j" . avy-goto-char)
 	("C-c g l" . avy-goto-line))
     #+END_SRC
+*** LSP
+    #+BEGIN_SRC emacs-lisp
+      (use-package lsp-mode
+	:ensure t
+	:init (setq lsp-keymap-prefix "C-c L")
+	:hook (c-mode . lsp)
+	:commands lsp)
+
+    #+END_SRC
+**** lsp addons
+     #+BEGIN_SRC emacs-lisp
+       (use-package lsp-ui
+	 :ensure t
+	 :commands lsp-ui-mode)
+
+       (use-package company-lsp
+	 :ensure t
+	 :commands company-lsp)
+     #+END_SRC
+
 *** Company
     #+BEGIN_SRC emacs-lisp
       (use-package company
 	:ensure t
 	:init 
-	:config (add-hook 'after-init-hook 'global-company-mode)
+	:config
+	(add-hook 'after-init-hook 'global-company-mode)
+	(setq company-idle-delay 0.2)
+	(setq company-minimum-prefix-length 2)
 	:bind )
     #+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
       (use-package flycheck
-	:ensure t)
+	:ensure t
+	:init (global-flycheck-mode))
     #+END_SRC
 *** God-mode
     #+BEGIN_SRC emacs-lisp
@@ -380,6 +436,9 @@ My emacs configuration
 	:bind ("ESC M-g" . 'god-mode-all))
     #+END_SRC
 *** Autopair
+    :PROPERTIES:
+    :tangle:   no
+    :END:
     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package autopair 
 	:ensure t
@@ -406,8 +465,9 @@ My emacs configuration
 
        ;; Store this file in register c
        ;; Open with C-x r j c
-       (set-register ?c `(file . ,(expand-file-name "conf.org" user-emacs-directory)))
+
      #+END_SRC
+
 **** region-reduce-radius
      #+BEGIN_SRC emacs-lisp
        (defun region-reduce-radius (dr)
@@ -433,6 +493,17 @@ My emacs configuration
 
        (global-set-key (kbd "C-c w") 'my-kill-word)
      #+END_SRC
+**** C-c m to edit makefile
+    #+BEGIN_SRC emacs-lisp
+      (global-set-key
+       (kbd "C-c m") 
+       '(lambda ()
+	  (interactive)
+	  (if (file-exists-p "[M|m]akefile")
+	      (find-file "[M|m]akefile")
+	    (find-file "Makefile"))))
+    #+END_SRC
+
 **** Pair helper functions
      We'll use this to calculate a character's pair
      #+BEGIN_SRC emacs-lisp
@@ -500,12 +571,23 @@ My emacs configuration
     #+END_SRC
 *** Babel Languages
     #+BEGIN_SRC emacs-lisp
+      (setq org-babel-default-header-args:matlab
+	'((:results . "value") (:session . "*MATLAB*")))
+    #+END_SRC
+
+    #+BEGIN_SRC emacs-lisp
 
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((emacs-lisp . t)
 	(python . t)
-	(shell . t)))
+	(shell . t)
+	(matlab . t)))
+    #+END_SRC
+*** ob-async
+    #+BEGIN_SRC emacs-lisp
+      (use-package ob-async
+	:ensure t)
     #+END_SRC
 *** org-bullets
     #+BEGIN_SRC emacs-lisp
@@ -668,63 +750,119 @@ My emacs configuration
     #+END_SRC
 *** Projectile
     #+BEGIN_SRC emacs-lisp
-      (use-package projectile
+	    (use-package projectile
+	      :ensure t
+	      :bind ("C-c p" . 'projectile-command-map))
+
+	    (projectile-global-mode t)
+    #+END_SRC
+** Impatient mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package impatient-mode
+       :ensure t)
+   #+END_SRC
+** C/C++
+#+BEGIN_SRC emacs-lisp
+  (use-package clang-format
+    :ensure t
+    :init (setq-default clang-format-style "llvm")
+    :bind (:map c-mode-map ("C-c f" . clang-format-buffer)))
+#+END_SRC
+** JavaScript
+   #+BEGIN_SRC emacs-lisp
+     (use-package dap-mode
+       :ensure t)
+   #+END_SRC
+** TODO Python
+   Use the elpy enviroment
+   #+BEGIN_SRC emacs-lisp
+     (use-package elpy
+       :config (elpy-enable)
+       :ensure t)
+   #+END_SRC
+   
+*** Anaconda
+    #+BEGIN_SRC emacs-lisp
+      (use-package anaconda-mode
 	:ensure t)
     #+END_SRC
-** TODO C/C++
-   We will use Irony mode and Rtags for completion
-   This requires clang and llvm
-*** Rtags
-    After installing the package run [[elisp:(rtags-install)][M-x rtags-install]] to install the daemon
-    #+BEGIN_SRC emacs-lisp
-      (use-package rtags
-	:ensure t
-	:config
-	(rtags-start-process-unless-running))
-    #+END_SRC
-**** Company
-     #+BEGIN_SRC emacs-lisp
-       (use-package company-rtags
-	 :ensure t)
+** Prolog
+   :PROPERTIES:
+   :header-args: :tangle yes
+   :END:
+   #+BEGIN_SRC emacs-lisp
+     (defcustom prolog-system 'swi
+       "*Prolog interpreter/compiler used.
+		  The value of this variable is nil or a symbol.
+		  If it is a symbol, it determines default values of other configuration
+		  variables with respect to properties of the specified Prolog
+		  interpreter/compiler.
 
-       (add-to-list 'company-backends 'company-rtags)
-     #+END_SRC
-**** Flycheck
-     #+BEGIN_SRC emacs-lisp
-       (use-package flycheck-rtags
-	 :ensure t)
+		  Currently recognized symbol values are:
+		  eclipse - Eclipse Prolog
+		  mercury - Mercury
+		  sicstus - SICStus Prolog
+		  swi     - SWI Prolog
+		  gnu     - GNU Prolog"
+       :group 'prolog
+       :type '(choice (const :tag "SICStus" :value sicstus)
+		      (const :tag "SWI Prolog" :value swi)
+		      (const :tag "Eclipse" :value eclipse)
+		      (const :tag "Default" :value nil)))
 
-     #+END_SRC
-*** Irony
-    #+BEGIN_SRC emacs-lisp
-      (use-package irony
-	:ensure t
-	:config
-	(add-hook 'c-mode-hook 'irony-mode))
+     (setq prolog-program-name 
+	   '((eclipse "eclipse-clp")
+	     (mercury nil)
+	     (sicstus "sicstus")
+	     (swi "swipl")
+	     (gnu "gprolog")))
+     (setq-default prolog-system 'swi
+		   prolog-program-switches '((t nil))
+		   prolog-electric-if-then-else-flag t)
+     (setq auto-mode-alist (append '(("\\.pl$" . prolog-mode)
+				     ("\\.m$" . mercury-mode))
+				   auto-mode-alist))
 
+     (use-package ediprolog
+       :ensure t
+       :bind ("<f10>" . ediprolog-dwim)
+       :config
+       (setq ediprolog-system 'swi))
 
-      (unless (file-exists-p
-	       (expand-file-name "irony-server"
-				 (concat irony-server-install-prefix "bin/")))
-	(irony-install-server))
-    #+END_SRC
-**** Company
-     #+BEGIN_SRC emacs-lisp
-
-       (use-package company-irony
-	 :ensure t
-	 :config
-	 (add-to-list 'company-backends 'company-irony))
-
-
-     #+END_SRC
-**** Flycheck
-     #+BEGIN_SRC emacs-lisp
-       (use-package flycheck-irony
-	 :ensure t
-	 :config
-	 (add-hook 'flycheck-mode-hook 'flycheck-irony-setup))
-     #+END_SRC
-
-** TODO Python
+   #+END_SRC
+** LUA
+   #+BEGIN_SRC emacs-lisp
+     (use-package lua-mode
+       :ensure t)
+   #+END_SRC
+** Haskell
+   #+BEGIN_SRC emacs-lisp
+     (use-package haskell-emacs
+       :ensure t)
+   #+END_SRC
+** Clojure
+   #+BEGIN_SRC emacs-lisp
+     (use-package cider
+       :ensure t)
+   #+END_SRC
 ** TODO More langs
+* Gnus
+#+BEGIN_SRC emacs-lisp
+  (setq user-mail-address "sdi1600197@di.uoa.gr"
+	user-full-name "Theodoros Chatziioannidis")
+
+  (setq gnus-select-method
+	'(nnimap "uoa"
+		 (nnimap-address "mail.uoa.gr")
+		 (nnimap-server-port "imaps")
+		 (nnimap-stream ssl)))
+
+  (setq gnus-fetch-old-headers 'some)
+
+  (setq gnus-article-sort-functions
+	'(gnus-article-sort-by-most-recent-date))
+
+  (setq gnus-thread-sort-functions
+	'(gnus-thread-sort-by-most-recent-date))
+#+END_SRC
+
