@@ -405,9 +405,9 @@ My emacs configuration
 	 :ensure t
 	 :commands lsp-ui-mode)
 
-       (use-package company-lsp
-	 :ensure t
-	 :commands company-lsp)
+       ;; (use-package company-lsp
+       ;;   :ensure t
+       ;;   :commands company-lsp)
      #+END_SRC
 
 *** Company
@@ -582,7 +582,8 @@ My emacs configuration
        '((emacs-lisp . t)
 	(python . t)
 	(shell . t)
-	(matlab . t)))
+	(matlab . t)
+	(latex . t)))
     #+END_SRC
 *** ob-async
     #+BEGIN_SRC emacs-lisp
@@ -715,28 +716,65 @@ My emacs configuration
      #+END_SRC
      Then define the document classes
      #+BEGIN_SRC emacs-lisp
-       (setq org-latex-classes
-	     (list (org-helper-create-class
-		    "article"
-		    '(("\\section{%s}" . "\\section*{%s}")
-		      ("\\subsection{%s}" . "\\subsection*{%s}")
-		      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-		      ("\\paragraph{%s}" . "\\paragraph*{%s}")
-		      ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-		   (org-helper-create-class
-		    "report" 
-		    '(("\\part{%s}" . "\\part*{%s}")
-		      ("\\chapter{%s}" . "\\chapter*{%s}")
-		      ("\\section{%s}" . "\\section*{%s}")
-		      ("\\subsection{%s}" . "\\subsection*{%s}")
-		      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-		   (org-helper-create-class
-		    "book"
-		    '(("\\part{%s}" . "\\part*{%s}")
-		      ("\\chapter{%s}" . "\\chapter*{%s}")
-		      ("\\section{%s}" . "\\section*{%s}")
-		      ("\\subsection{%s}" . "\\subsection*{%s}")
-		      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
+				   (setq org-latex-classes
+					 (list (org-helper-create-class
+						"article"
+						'(("\\section{%s}" . "\\section*{%s}")
+						  ("\\subsection{%s}" . "\\subsection*{%s}")
+						  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+						  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+						  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+					       (org-helper-create-class
+						"report" 
+						'(("\\part{%s}" . "\\part*{%s}")
+						  ("\\chapter{%s}" . "\\chapter*{%s}")
+						  ("\\section{%s}" . "\\section*{%s}")
+						  ("\\subsection{%s}" . "\\subsection*{%s}")
+						  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+					       (org-helper-create-class
+						"book"
+						'(("\\part{%s}" . "\\part*{%s}")
+						  ("\\chapter{%s}" . "\\chapter*{%s}")
+						  ("\\section{%s}" . "\\section*{%s}")
+						  ("\\subsection{%s}" . "\\subsection*{%s}")
+						  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+					       '("dithesis"
+
+       "% demo.tex
+	%
+	% Enjoy, evolve, and share!
+	%
+	% Compile it as follows:
+	%   latexmk
+	%
+	% Check file `dithesis.cls' for other configuration options.
+	%
+	\\documentclass[inscr,ack,preface]{dithesis}
+
+	%\\usepackage{graphicx}
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%% User-specific package inclusions %%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\\usepackage{booktabs}
+	\\usepackage{hyperref}
+	\\usepackage{lipsum}
+	\\usepackage{enumerate}
+	\\usepackage{amsmath}
+	\\usepackage{amssymb}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%% User-specific package inclusions %%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%% User-specific configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%% User-specific configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       \\usepackage{hanging}
+	" ("\\chapter{%s}" . "\\chapter{%s}") ("\\section{%s}" . "\\section{%s}") ("\\subsection{%s}" . "\\subsection{%s}"))))
 
      #+END_SRC
 ** Project management
