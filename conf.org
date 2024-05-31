@@ -95,13 +95,23 @@ My emacs configuration
 * Visual
 ** Theme
    
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package doom-themes
        :ensure t
        :config (load-theme 'doom-city-lights t))
 
+
+
      (set 'light-theme 'doom-solarized-light)
      (set 'dark-theme 'doom-city-lights)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (use-package darktooth-theme
+       :ensure t
+       :config (load-theme 'darktooth-dark))
+
+     (load-theme 'darktooth-dark)
    #+END_SRC
 ** Modeline
    #+BEGIN_SRC emacs-lisp
@@ -111,7 +121,7 @@ My emacs configuration
        (powerline-center-theme))
    #+END_SRC
 ** Light/Dark toggle
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (setq light/dark-theme-setting-state 0)
 
      (defun light/dark-toggle (&optional set-state)
@@ -134,12 +144,18 @@ My emacs configuration
    Set the font to something nice
    #+BEGIN_SRC emacs-lisp
      (set-face-attribute 'default nil 
-			 :width 'expanded
-			 :height 110
+			 :height 100
 			 :weight 'normal
 			 :stipple nil
-			 :font "Source code Pro")
-     (set-fontset-font "fontset-default" 'unicode "Wuncon Siji")
+			 :font "Cousine")
+
+
+
+     (add-hook 'after-make-frame-functions
+		    (lambda (frame) (set-fontset-font t '(#xf000 . #xf8ff) "Font Awesome 6 Free" nil 'prepend)))
+
+
+
    #+END_SRC   
 
 ** Cursor
@@ -335,10 +351,7 @@ My emacs configuration
     #+END_SRC
 *** Quick Compile
     #+BEGIN_SRC emacs-lisp
-      (global-set-key (kbd "C-c c")
-		      '(lambda ()
-			 (interactive)
-			 (compile "make")))
+      (global-set-key (kbd "C-c c") 'compile)
     #+END_SRC
 *** Shell-command
     If there is a prefix argument call shell-command so that we don't move the point
@@ -359,7 +372,6 @@ My emacs configuration
       (use-package yasnippet
 	:ensure t
 	:config
-	(setq yas-snippet-dirs '("~/.emacs.d/yasnippet-snippets/snippets/"))
 	(yas-global-mode t))
     #+END_SRC
 
@@ -384,7 +396,7 @@ My emacs configuration
 	:ensure t
 	:init 
 	:config
-	(setq avy-keys (number-sequence ?a ?z)
+	(setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l ?\;)
 	      avy-timeout-seconds 0.5)
 	:bind
 	("C-c g j" . avy-goto-char)
@@ -455,6 +467,7 @@ My emacs configuration
     #+BEGIN_SRC emacs-lisp
       (electric-pair-mode t)
     #+END_SRC
+elisp_
 *** Custom functions
 **** Config functions
      Visit Config
@@ -554,6 +567,14 @@ My emacs configuration
     #+BEGIN_SRC emacs-lisp
       (global-prettify-symbols-mode t)
     #+END_SRC
+
+*** envrc
+#+BEGIN_SRC emacs-lisp
+  (use-package envrc
+    :ensure t
+    :config (envrc-global-mode))
+#+END_SRC
+
 ** Auctex
    #+BEGIN_SRC emacs-lisp
      (use-package auctex
@@ -569,6 +590,7 @@ My emacs configuration
       (define-key global-org-keymap (kbd "c") 'org-capture)
       (global-set-key (kbd "ESC M-o") global-org-keymap)
     #+END_SRC
+    
 *** Babel Languages
     #+BEGIN_SRC emacs-lisp
       (setq org-babel-default-header-args:matlab
@@ -773,7 +795,6 @@ My emacs configuration
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%% User-specific configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-       \\usepackage{hanging}
 	" ("\\chapter{%s}" . "\\chapter{%s}") ("\\section{%s}" . "\\section{%s}") ("\\subsection{%s}" . "\\subsection{%s}"))))
 
      #+END_SRC
@@ -883,6 +904,12 @@ My emacs configuration
      (use-package cider
        :ensure t)
    #+END_SRC
+** Docker
+#+begin_src emacs-lisp :tangle yes
+    (use-package docker
+      :ensure t
+      :bind ("C-c d" . docker))
+#+end_src
 ** TODO More langs
 * Gnus
 #+BEGIN_SRC emacs-lisp
