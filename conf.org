@@ -43,7 +43,7 @@ My emacs configuration
   you should be able to install by following the links.
 
   [[elisp:((lambda%20(file)%20(copy-file%20file%20(concat%20file%20".bk")%20t)%20(search-forward%20"#+BEGIN_SRC")%20(next-line)%20(org-edit-src-code)%20(write-file%20file%20t)%20(kill-buffer)%20(find-file%20(expand-file-name%20file%20user-emacs-directory))%20(print%20(format%20"%25s%20backed%20up%20to%20%25s"%20file%20(concat%20file%20".bk"))))%20(expand-file-name%20"init.el"%20user-emacs-directory))][Create init.el]](Backs up your current init.el as init.el.bk)
-  #+BEGIN_SRC emacs-lisp :tangle no
+  #+BEGIN_SRC emacs-lisp :tangle init.el
     ;; Sample init.el
 
     (require 'package)
@@ -222,7 +222,7 @@ My emacs configuration
 **** Ensure and enable
      #+BEGIN_SRC emacs-lisp
        (use-package ido
-	 :ensure t
+	 ;; :ensure t ;; included in emacs
 	 :config 
 	 (ido-mode t)
 	 (ido-everywhere t))
@@ -273,7 +273,7 @@ My emacs configuration
    The winmove-C-c-move-* functions allow us to overwrite then with extra functionality
    #+BEGIN_SRC emacs-lisp
      (use-package windmove
-       :ensure t
+       ;; :ensure t
        :bind (("C-c h" . windmove-left)
 	      ("C-c j" . windmove-down)
 	      ("C-c k" . windmove-up)
