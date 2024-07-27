@@ -43,7 +43,7 @@ My emacs configuration
   you should be able to install by following the links.
 
   [[elisp:((lambda%20(file)%20(copy-file%20file%20(concat%20file%20".bk")%20t)%20(search-forward%20"#+BEGIN_SRC")%20(next-line)%20(org-edit-src-code)%20(write-file%20file%20t)%20(kill-buffer)%20(find-file%20(expand-file-name%20file%20user-emacs-directory))%20(print%20(format%20"%25s%20backed%20up%20to%20%25s"%20file%20(concat%20file%20".bk"))))%20(expand-file-name%20"init.el"%20user-emacs-directory))][Create init.el]](Backs up your current init.el as init.el.bk)
-  #+BEGIN_SRC emacs-lisp :tangle init.el
+  #+BEGIN_SRC emacs-lisp :tangle "init.el"
     ;; Sample init.el
 
     (require 'package)
@@ -796,13 +796,31 @@ elisp_
 	%%%%%%%%%%%%%%%%%%%% User-specific package inclusions %%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+	\\usepackage{graphicx}	   
+	\\usepackage{longtable}	   
+	\\usepackage{wrapfig}	   
+	\\usepackage{rotating}	   
+	\\usepackage[normalem]{ulem}
+	\\usepackage{amsmath}	   
+	\\usepackage{amssymb}	   
+	\\usepackage{capt-of}	   
+	\\usepackage{hyperref}	   
+	\\usepackage{unicode-math}  
+	\\usepackage{fontspec}	   
+	\\usepackage{algorithm2e}   
+	\\usepackage{unicode-math}  
+	\\usepackage{caption}
+	\\usepackage{subcaption}
+	\\captionsetup{compatibility=false}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%% User-specific configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%% User-specific configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\\usepackage{hanging}
+        [NO-DEFAULT-PACKAGES]
+	[NO-PACKAGES]
 	" ("\\chapter{%s}" . "\\chapter{%s}") ("\\section{%s}" . "\\section{%s}") ("\\subsection{%s}" . "\\subsection{%s}"))))
 
      #+END_SRC
