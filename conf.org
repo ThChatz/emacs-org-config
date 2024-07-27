@@ -92,6 +92,13 @@ My emacs configuration
      (setenv "MAGICK_OCL_DEVICE" "OFF")
    #+END_SRC
 
+** on this this is the only init so we need to load some things
+# #+BEGIN_SRC emacs-lisp
+#   (require 'use-package)
+#   (require 'org)
+
+# #+END_SRC
+
 * Visual
 ** Theme
    
@@ -232,6 +239,7 @@ My emacs configuration
        (use-package smex
 	 :ensure t
 	 :init 
+	 (require 'bind-key)
 	 :config
 	 (smex-initialize)
 	 :bind
