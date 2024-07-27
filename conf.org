@@ -912,11 +912,14 @@ elisp_
      (use-package cider
        :ensure t)
    #+END_SRC
-** Docker
+** Infra
 #+begin_src emacs-lisp :tangle yes
-    (use-package docker
-      :ensure t
-      :bind ("C-c d" . docker))
+  (use-package docker
+    :ensure t
+    :bind ("C-c d" . docker))
+
+  (use-package nix-mode
+    :ensure t)
 #+end_src
 ** TODO More langs
 * Gnus

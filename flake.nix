@@ -5,7 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    
+
+    # flake-utils.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.inputs.flake-utils.follows = "flake-utils";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, emacs-overlay, flake-utils }:
