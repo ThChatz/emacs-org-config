@@ -937,7 +937,8 @@ elisp_
     :bind ("C-c d" . docker))
 
   (use-package nix-mode
-    :ensure t)
+    :ensure t
+    :mode "\\.nix\\'")
 #+end_src
 ** TODO More langs
 * Gnus
