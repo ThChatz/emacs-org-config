@@ -377,10 +377,15 @@ My emacs configuration
 
 *** Yasnippet
     #+BEGIN_SRC emacs-lisp
+      (use-package yasnippet-snippets
+	:ensure t)
+
       (use-package yasnippet
 	:ensure t
 	:config
 	(yas-global-mode t))
+
+
     #+END_SRC
 
 *** Undo-tree
@@ -940,6 +945,11 @@ elisp_
     :ensure t
     :mode "\\.nix\\'")
 #+end_src
+** PHP
+#+BEGIN_SRC emacs-lisp
+    (use-package php-mode
+      :ensure t)
+#+END_SRC
 ** TODO More langs
 * Gnus
 #+BEGIN_SRC emacs-lisp
